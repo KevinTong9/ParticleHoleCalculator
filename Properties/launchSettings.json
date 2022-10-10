@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ParticleHoleCalculator": {
+      "commandName": "Project",
+      "commandLineArgs": "-i C:\\Users\\T_VISION\\Desktop1\\ParticleHoleCalculator\\dump2.9in -o ./out.txt -b 8,8,8 -d 3 -t 1"
+    }
+  }
+}
