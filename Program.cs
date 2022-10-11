@@ -1,12 +1,11 @@
 ﻿#define pub
 // #define debug
 using System;
-using System.IO;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.Threading;
-using System.Linq;
+using System.Diagnostics;
+using System.IO;
 using System.Security;
+using System.Threading;
 
 namespace ParticleHoleCalculator
 {
@@ -60,7 +59,7 @@ namespace ParticleHoleCalculator
             private static ulong[] boxSideLength = new ulong[3] { 8, 8, 8 };
             private static ulong density = 3;
             private static ulong threshold = 1;
-            private const string helpInfo = "this is help message?\n";
+            private const string helpInfo = "this is help message?{Environment.NewLine}";
             /// <summary>
             /// 初步判断参数是否符合输入结构
             /// </summary>
@@ -141,38 +140,38 @@ namespace ParticleHoleCalculator
                                 }
                                 catch (UnauthorizedAccessException UAE)
                                 {
-                                    logger(_loggerT.Fail, $"文件权限不足\n");
-                                    logger(_loggerT.DEBUG, $"{UAE.Message}\n");
+                                    logger(_loggerT.Fail, $"文件权限不足{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{UAE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (ArgumentException AE)
                                 {
-                                    logger(_loggerT.Fail, $"文件未找到\n");
-                                    logger(_loggerT.DEBUG, $"{AE.Message}\n");
+                                    logger(_loggerT.Fail, $"文件未找到{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{AE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (PathTooLongException PTLE)
                                 {
-                                    logger(_loggerT.Fail, $"输入文件名过长\n");
-                                    logger(_loggerT.DEBUG, $"{PTLE.Message}\n");
+                                    logger(_loggerT.Fail, $"输入文件名过长{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{PTLE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (DirectoryNotFoundException DNFE)
                                 {
-                                    logger(_loggerT.Fail, $"指定的路径无效\n");
-                                    logger(_loggerT.DEBUG, $"{DNFE.Message}\n");
+                                    logger(_loggerT.Fail, $"指定的路径无效{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{DNFE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (FileNotFoundException FNFE)
                                 {
-                                    logger(_loggerT.Fail, $"未找到指定的文件\n");
-                                    logger(_loggerT.DEBUG, $"{FNFE.Message}\n");
+                                    logger(_loggerT.Fail, $"未找到指定的文件{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{FNFE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (NotSupportedException NSE)
                                 {
-                                    logger(_loggerT.Fail, $"输入文件有误\n");
-                                    logger(_loggerT.DEBUG, $"{NSE.Message}\n");
+                                    logger(_loggerT.Fail, $"输入文件有误{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{NSE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 finally
@@ -186,42 +185,42 @@ namespace ParticleHoleCalculator
                                 i++;
                                 try
                                 {
-                                    outputFile = new StreamWriter(@$"{args[i]}");
+                                    outputFile = new StreamWriter(@$"{args[i]}", false);
                                 }
                                 catch (UnauthorizedAccessException UAE)
                                 {
-                                    logger(_loggerT.Fail, $"无法创建文件，文件权限不足\n");
-                                    logger(_loggerT.DEBUG, $"{UAE.Message}\n");
+                                    logger(_loggerT.Fail, $"无法创建文件，文件权限不足{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{UAE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (ArgumentException AE)
                                 {
-                                    logger(_loggerT.Fail, $"无输出文件\n");
-                                    logger(_loggerT.DEBUG, $"{AE.Message}\n");
+                                    logger(_loggerT.Fail, $"无输出文件{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{AE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (DirectoryNotFoundException DNFE)
                                 {
-                                    logger(_loggerT.Fail, $"指定的路径无效\n");
-                                    logger(_loggerT.DEBUG, $"{DNFE.Message}\n");
+                                    logger(_loggerT.Fail, $"指定的路径无效{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{DNFE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (PathTooLongException PTLE)
                                 {
-                                    logger(_loggerT.Fail, $"输出文件名过长\n");
-                                    logger(_loggerT.DEBUG, $"{PTLE.Message}\n");
+                                    logger(_loggerT.Fail, $"输出文件名过长{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{PTLE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (IOException IOE)
                                 {
-                                    logger(_loggerT.Fail, $"输出文件文件名非法\n");
-                                    logger(_loggerT.DEBUG, $"{IOE.Message}\n");
+                                    logger(_loggerT.Fail, $"输出文件文件名非法{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{IOE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (SecurityException SE)
                                 {
-                                    logger(_loggerT.Fail, $"无权限输出文件\n");
-                                    logger(_loggerT.DEBUG, $"{SE.Message}\n");
+                                    logger(_loggerT.Fail, $"无权限输出文件{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{SE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 finally
@@ -237,7 +236,7 @@ namespace ParticleHoleCalculator
                                 var apr = args[i].Split(',');
                                 if (apr.Length != 3)
                                 {
-                                    logger(_loggerT.Fail, $"单箱参数个数有误\n");
+                                    logger(_loggerT.Fail, $"单箱参数个数有误{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 else
@@ -249,21 +248,21 @@ namespace ParticleHoleCalculator
                                             boxSideLength[t] = Convert.ToUInt64(apr[t]);
                                             if (boxSideLength[t] == 0)
                                             {
-                                                logger(_loggerT.Fail, $"单箱边长不能为0\n");
+                                                logger(_loggerT.Fail, $"单箱边长不能为0{Environment.NewLine}");
                                                 Environment.Exit(-1);
                                             }
                                         }
                                     }
                                     catch (FormatException FE)
                                     {
-                                        logger(_loggerT.Fail, $"单箱边长非整或存在特殊符号\n");
-                                        logger(_loggerT.DEBUG, $"{FE.Message}\n");
+                                        logger(_loggerT.Fail, $"单箱边长非整或存在特殊符号{Environment.NewLine}");
+                                        logger(_loggerT.DEBUG, $"{FE.Message}{Environment.NewLine}");
                                         Environment.Exit(-1);
                                     }
                                     catch (OverflowException OFE)
                                     {
-                                        logger(_loggerT.Fail, $"单箱边长大小超出边界\n");
-                                        logger(_loggerT.DEBUG, $"{OFE.Message}\n");
+                                        logger(_loggerT.Fail, $"单箱边长大小超出边界{Environment.NewLine}");
+                                        logger(_loggerT.DEBUG, $"{OFE.Message}{Environment.NewLine}");
                                         Environment.Exit(-1);
                                     }
                                 }
@@ -278,20 +277,20 @@ namespace ParticleHoleCalculator
                                     density = Convert.ToUInt64(args[i]);
                                     if (density == 0)
                                     {
-                                        logger(_loggerT.Fail, $"粒子阈值密度不能为0\n");
+                                        logger(_loggerT.Fail, $"粒子阈值密度不能为0{Environment.NewLine}");
                                         Environment.Exit(-1);
                                     }
                                 }
                                 catch (FormatException FE)
                                 {
-                                    logger(_loggerT.Fail, $"粒子阈值密度非整或存在特殊符号\n");
-                                    logger(_loggerT.DEBUG, $"{FE.Message}\n");
+                                    logger(_loggerT.Fail, $"粒子阈值密度非整或存在特殊符号{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{FE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (OverflowException OFE)
                                 {
-                                    logger(_loggerT.Fail, $"粒子阈值密度数字大小超出边界\n");
-                                    logger(_loggerT.DEBUG, $"{OFE.Message}\n");
+                                    logger(_loggerT.Fail, $"粒子阈值密度数字大小超出边界{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{OFE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 break;
@@ -305,20 +304,20 @@ namespace ParticleHoleCalculator
                                     threshold = Convert.ToUInt64(args[i]);
                                     if (threshold == 0)
                                     {
-                                        logger(_loggerT.Fail, $"箱数阈值不能为0\n");
+                                        logger(_loggerT.Fail, $"箱数阈值不能为0{Environment.NewLine}");
                                         Environment.Exit(-1);
                                     }
                                 }
                                 catch (FormatException FE)
                                 {
-                                    logger(_loggerT.Fail, $"箱数阈值非整或存在特殊符号\n");
-                                    logger(_loggerT.DEBUG, $"{FE.Message}\n");
+                                    logger(_loggerT.Fail, $"箱数阈值非整或存在特殊符号{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{FE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (OverflowException OFE)
                                 {
-                                    logger(_loggerT.Fail, $"箱数阈值数字大小超出边界\n");
-                                    logger(_loggerT.DEBUG, $"{OFE.Message}\n");
+                                    logger(_loggerT.Fail, $"箱数阈值数字大小超出边界{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{OFE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 break;
@@ -334,7 +333,7 @@ namespace ParticleHoleCalculator
                     Environment.Exit(-1);
             }
 
-            //public override string ToString() => $"{(needDebug?"已开启DEBUG模式\n":"")}输入文件：{in}";            public bool IsNeedHelp() => needAnyHelp;
+            //public override string ToString() => $"{(needDebug?"已开启DEBUG模式{Environment.NewLine}":"")}输入文件：{in}";            public bool IsNeedHelp() => needAnyHelp;
             public bool IsNeedDebug() => needDebug;
             public StreamReader GetStreamReader() => inputFile;
             public StreamWriter GetStreamWriter() => outputFile;
@@ -449,10 +448,16 @@ namespace ParticleHoleCalculator
             { id = _id; type = _type; pos.x = _x; pos.y = _y; pos.z = _z; }
             public ATOM(ulong _id, int _type, dot _dot)
             { id = _id; type = _type; pos.x = _dot.x; pos.y = _dot.y; pos.z = _dot.z; }
+            public void ChangeType(ulong box_id, bool istype1)
+            {
+                type = (int)((istype1 ? 2 * box_id - 1 : 2 * box_id));
+            }
+            public override string ToString() => $"{id} {type} {pos.x} {pos.y} {pos.z}";
         }
 
         /// <summary>
         /// 单时间帧数据结构
+        /// 注：atomsNum[n]对应的是id为n+1的粒子
         /// </summary>
         private struct Unit
         {
@@ -476,64 +481,100 @@ namespace ParticleHoleCalculator
             public void AddAtom(String input)
             {
                 var _input = input.Split(' ');
-                Debug.Assert(_input.Length == 5);
 
-                ulong _id = Convert.ToUInt64(_input[0]);
-                int _type = Convert.ToInt32(_input[1]);
-                double _x = Convert.ToDouble(_input[2]), _y = Convert.ToDouble(_input[3]), _z = Convert.ToDouble(_input[4]);
+                if (_input.Length < 5)
+                {
+                    logger(_loggerT.Warning, $"此数据集坐标数据量不足:{input}{Environment.NewLine}");
+                    Environment.Exit(-1);
+                }
+
+                ulong _id;
+                int _type;
+                double _x, _y, _z;
+                try
+                {
+                    Convert.ToUInt64(_input[0]);
+                    Convert.ToInt32(_input[1]);
+                    Convert.ToDouble(_input[2]);
+                    Convert.ToDouble(_input[3]);
+                    Convert.ToDouble(_input[4]);
+                }
+                catch (FormatException FE)
+                {
+                    logger(_loggerT.Fail, $"粒子阈值密度非整或存在特殊符号{Environment.NewLine}");
+                    logger(_loggerT.DEBUG, $"{FE.Message}{Environment.NewLine}");
+                    Environment.Exit(-1);
+                }
+                catch (OverflowException OFE)
+                {
+                    logger(_loggerT.Fail, $"粒子阈值密度数字大小超出边界{Environment.NewLine}");
+                    logger(_loggerT.DEBUG, $"{OFE.Message}{Environment.NewLine}");
+                    Environment.Exit(-1);
+                }
+                finally
+                {
+                    _id = Convert.ToUInt64(_input[0]);
+                    _type = Convert.ToInt32(_input[1]);
+                    _x = Convert.ToDouble(_input[2]);
+                    _y = Convert.ToDouble(_input[3]);
+                    _z = Convert.ToDouble(_input[4]);
+                }
                 ATOM _atom = new ATOM(_id, _type, _x, _y, _z);
                 this.atomsData[_id - 1] = _atom;
                 // x边界溢出检查
                 if (_x < this.boxEdge[0, 0])
                 {
+                    logger(_loggerT.Warning, $"ATOM:{_id} [x]:{_x:0.000} 超出界限 [{this.boxEdge[0, 0]:0.000},{this.boxEdge[0, 1]:0.000}){Environment.NewLine}");
                     this.boxEdge[0, 0] = _x;
-                    logger(_loggerT.Warning, $"ATOM:{_id} [x]:{_x:0.000} out of bound [{this.boxEdge[0, 0]:0.000},{this.boxEdge[0, 1]:0.000}){Environment.NewLine}" +
-                    $"\tnew bound [{this.boxEdge[0, 0]:0.000},{this.boxEdge[0, 1]:0.000}) established{Environment.NewLine}");
+                    logger(_loggerT.Note, $"新边界 [{this.boxEdge[0, 0]:0.000},{this.boxEdge[0, 1]:0.000}) 建立{Environment.NewLine}");
                 }
                 else if (this.boxEdge[0, 1] <= _x)
                 {
+                    logger(_loggerT.Warning, $"ATOM:{_id} [x]:{_x:0.000} 超出界限 [{this.boxEdge[0, 0]:0.000},{this.boxEdge[0, 1]:0.000}){Environment.NewLine}");
                     this.boxEdge[0, 1] = _x + 1;
-                    logger(_loggerT.Warning, $"ATOM:{_id} [x]:{_x:0.000} out of bound [{this.boxEdge[0, 0]:0.000},{this.boxEdge[0, 1]:0.000}){Environment.NewLine}" +
-                    $"\tnew bound [{this.boxEdge[0, 0]:0.000},{this.boxEdge[0, 1]:0.000}) established{Environment.NewLine}");
+                    logger(_loggerT.Note, $"新边界 [{this.boxEdge[0, 0]:0.000},{this.boxEdge[0, 1]:0.000}) 建立{Environment.NewLine}");
                 }
                 // y界溢出检查
                 if (_y < this.boxEdge[1, 0])
                 {
+                    logger(_loggerT.Warning, $"ATOM:{_id} [y]:{_y:0.000} 超出界限 [{this.boxEdge[1, 0]:0.000},{this.boxEdge[1, 1]:0.000}){Environment.NewLine}");
                     this.boxEdge[1, 0] = _y;
-                    logger(_loggerT.Warning, $"ATOM:{_id} [y]:{_y:0.000} out of bound [{this.boxEdge[1, 0]:0.000},{this.boxEdge[1, 1]:0.000}){Environment.NewLine}" +
-                    $"\tnew bound [{this.boxEdge[1, 0]:0.000},{this.boxEdge[1, 1]:0.000}) established{Environment.NewLine}");
+                    logger(_loggerT.Note, $"新边界 [{this.boxEdge[1, 0]:0.000},{this.boxEdge[1, 1]:0.000}) 建立{Environment.NewLine}");
                 }
                 else if (this.boxEdge[1, 1] <= _y)
                 {
+                    logger(_loggerT.Warning, $"ATOM:{_id} [y]:{_y:0.000} 超出界限 [{this.boxEdge[1, 0]:0.000},{this.boxEdge[1, 1]:0.000}){Environment.NewLine}");
                     this.boxEdge[1, 1] = _y + 1;
-                    logger(_loggerT.Warning, $"ATOM:{_id} [y]:{_y:0.000} out of bound [{this.boxEdge[1, 0]:0.000},{this.boxEdge[1, 1]:0.000}){Environment.NewLine}" +
-                    $"\tnew bound [{this.boxEdge[1, 0]:0.000},{this.boxEdge[1, 1]:0.000}) established{Environment.NewLine}");
+                    logger(_loggerT.Note, $"新边界 [{this.boxEdge[1, 0]:0.000},{this.boxEdge[1, 1]:0.000}) 建立{Environment.NewLine}");
                 }
                 // z边界溢出检查
                 if (_z < this.boxEdge[2, 0])
                 {
+                    logger(_loggerT.Warning, $"ATOM:{_id} [z]:{_z:0.000} 超出界限 [{this.boxEdge[2, 0]:0.000},{this.boxEdge[2, 1]:0.000}){Environment.NewLine}");
                     this.boxEdge[2, 0] = _z;
-                    logger(_loggerT.Warning, $"ATOM:{_id} [z]:{_z:0.000} out of bound [{this.boxEdge[2, 0]:0.000},{this.boxEdge[2, 1]:0.000}){Environment.NewLine}" +
-                    $"\tnew bound [{this.boxEdge[2, 0]:0.000},{this.boxEdge[2, 1]:0.000}) established{Environment.NewLine}");
+                    logger(_loggerT.Note, $"新边界 [{this.boxEdge[2, 0]:0.000},{this.boxEdge[2, 1]:0.000}) 建立{Environment.NewLine}");
                 }
                 else if (this.boxEdge[2, 1] <= _z)
                 {
+                    logger(_loggerT.Warning, $"ATOM:{_id} [z]:{_z:0.000} 超出界限 [{this.boxEdge[2, 0]:0.000},{this.boxEdge[2, 1]:0.000}){Environment.NewLine}");
                     this.boxEdge[2, 1] = _z + 1;
-                    logger(_loggerT.Warning, $"ATOM:{_id} [z]:{_z:0.000} out of bound [{this.boxEdge[2, 0]:0.000},{this.boxEdge[2, 1]:0.000}){Environment.NewLine}" +
-                    $"\tnew bound [{this.boxEdge[2, 0]:0.000},{this.boxEdge[2, 1]:0.000}) established{Environment.NewLine}");
+                    logger(_loggerT.Note, $"新边界 [{this.boxEdge[2, 0]:0.000},{this.boxEdge[2, 1]:0.000}) 建立{Environment.NewLine}");
                 }
             }
 
             /// <summary>
-            /// 根据a,b,c模糊箱长与atomLimit限制计算atomsData中孔洞数量与孔洞信息
+            /// 根据a,b,c模糊箱长与atomLimit限制计算atomsData中孔洞数量与孔洞信息并输出文件
             /// </summary>
-            /// <param name="a">模糊箱长x</param>
-            /// <param name="b">模糊箱长y</param>
-            /// <param name="c">模糊箱长z</param>
-            /// <param name="atomLimit">模糊箱粒子个数</param>
+            /// <param name="a">模糊箱长</param>
+            /// <param name="b">模糊箱宽</param>
+            /// <param name="c">模糊箱高</param>
+            /// <param name="atomLimit">粒子密度</param>
+            /// <param name="threshold">孔洞箱阈值 </param>
+            /// <param name="outFile">输出文件流</param>
             /// <returns></returns>
-            public ulong CountHole(ulong a, ulong b, ulong c, ulong atomLimit, ulong threshold)
+            public ulong CountHoleAndOutputFile(ulong a, ulong b, ulong c, ulong atomLimit, ulong threshold, StreamWriter outFile)
             {
+                // 边长模糊算法
                 // 各轴分离箱数
                 ulong x_n = (ulong)(Math.Abs(boxEdge[0, 1] - boxEdge[0, 0])) / a;
                 ulong y_n = (ulong)(Math.Abs(boxEdge[1, 1] - boxEdge[1, 0])) / b;
@@ -544,7 +585,9 @@ namespace ParticleHoleCalculator
                 double z_i = Math.Abs(boxEdge[2, 1] - boxEdge[2, 0]) / (double)(z_n);
 
                 #region 内存占用声明拓展
+                // 三维坐标标签ATOM数组
                 List<List<List<List<ATOM>>>> box = new List<List<List<List<ATOM>>>>();
+                // 初始化
                 for (ulong i = 0; i < x_n; i++)
                 {
                     box.Add(new List<List<List<ATOM>>>());
@@ -622,21 +665,26 @@ namespace ParticleHoleCalculator
                     logger(_loggerT.None, $"{Environment.NewLine}");
                 }
 #endif
-                #region 前端BFS算法
+                #region 前端BFS算法&输出
                 ulong holesNum = 0;
+                ATOM[] atomsArr = atomsData;
+                for (int p = 0; p < atomsArr.Length; p++)
+                    atomsArr[p].type = -1;
+
+                Debug.Assert((ulong)atomsArr.Length == atomsNum);
                 for (long i = 0; (ulong)i < x_n; i++)
                     for (long j = 0; (ulong)j < y_n; j++)
                         for (long k = 0; (ulong)k < z_n; k++)
                             if (box_score[i, j, k])
                             {
+                                #region 断层堆栈
                                 var result = frontBFS(ref box_score, new long[] { i, j, k }, 0);
                                 var tmpResult = result;
                                 while (true)
                                 {
                                     var moreResult = new List<dot>();
                                     foreach (var item in tmpResult)
-                                        if ((long)item.x > i && (long)item.y > j && (long)item.z > k)
-                                            moreResult.AddRange(frontBFS(ref box_score, new long[] { (long)item.x, (long)item.y, (long)item.z }, 0));
+                                        moreResult.AddRange(frontBFS(ref box_score, new long[] { (long)item.x, (long)item.y, (long)item.z }, 0));
                                     if (moreResult.Count == 0)
                                     { break; }
                                     else
@@ -645,10 +693,14 @@ namespace ParticleHoleCalculator
                                         tmpResult = moreResult;
                                     }
                                 };
+                                #endregion
+                                #region 后续处理
                                 if ((ulong)result.Count > threshold)
                                 {
+                                    // 孔洞计数器
                                     holesNum++;
-                                    // logger(_loggerT.None, "{Environment.NewLine}");
+                                    // 新组粒子信息储存
+                                    // logger(_loggerT.None, $"{Environment.NewLine}");
                                     // logger(_loggerT.Success, $"Hole #{holesNum}:{Environment.NewLine}");
                                     // logger(_loggerT.Info, $"BoxNum:{result.Count}{Environment.NewLine}");
                                     ulong type1Num = 0, type2Num = 0;
@@ -657,13 +709,33 @@ namespace ParticleHoleCalculator
                                         // logger(_loggerT.None, $"id\ttype\tx.\ty\tz{Environment.NewLine}");
                                         foreach (var atom_item in box[(int)item.x][(int)item.y][(int)item.z])
                                         {
+                                            Debug.Assert(atom_item.id > 0);
+                                            var isType1 = (atom_item.type == 1);
+                                            atomsArr[(int)(atom_item.id - 1)].ChangeType(holesNum, isType1);
                                             // logger(_loggerT.None, $"{atom_item.id}\t{atom_item.type}\t{atom_item.pos.ToString('\t')}{Environment.NewLine}");
-                                            if (atom_item.type == 1) type1Num++; else type2Num++;
+                                            if (isType1) type1Num++; else type2Num++;
                                         }
                                     }
                                     logger(_loggerT.Info, $"AtomNum:{type1Num + type2Num}\ttype1Num:{type1Num}\\{((double)type1Num * 100 / (double)(type1Num + type2Num)):0.00}%\ttype2Num:{type2Num}\\{((double)type2Num * 100 / (double)(type1Num + type2Num)):0.00}%{Environment.NewLine}");
                                 }
+                                #endregion
                             }
+                outFile.Write($"ITEM: TIMESTEP{Environment.NewLine}" +
+                                       $"{timestep}{Environment.NewLine}" +
+                                       $"ITEM: NUMBER OF ATOMS{Environment.NewLine}" +
+                                       $"{atomsNum}{Environment.NewLine}" +
+                                       $"ITEM: BOX BOUNDS pp pp pp{Environment.NewLine}" +
+                                       $"{boxEdge[0, 0]:0.0000000000000000e+00} {boxEdge[0, 1]:0.0000000000000000e+00}{Environment.NewLine}" +
+                                       $"{boxEdge[1, 0]:0.0000000000000000e+00} {boxEdge[1, 1]:0.0000000000000000e+00}{Environment.NewLine}" +
+                                       $"{boxEdge[2, 0]:0.0000000000000000e+00} {boxEdge[2, 1]:0.0000000000000000e+00}{Environment.NewLine}" +
+                                       $"ITEM: ATOMS id type x y z{Environment.NewLine}");
+                logger(_loggerT.DEBUG, $"CCC:{atomsArr.Length}\n");
+                for (int p = 0; p < atomsArr.Length; p++)
+                {
+                    outFile.WriteLine(atomsArr[p].ToString());
+                }
+                //foreach (var item in atomsArr)
+                //outFile.WriteLine(item.ToString());
                 #endregion
 
                 return holesNum;
@@ -728,7 +800,7 @@ namespace ParticleHoleCalculator
             $"{unit.boxEdge[1, 0]}\t{unit.boxEdge[1, 1]}{Environment.NewLine}" +
             $"{unit.boxEdge[2, 0]}\t{unit.boxEdge[2, 1]}{Environment.NewLine}"
             );
-            logger(_loggerT.DEBUG, "Please input id to get atom data:");
+            logger(_loggerT.DEBUG, $"Please input id to get atom data:");
             string _index_str = String.Empty;
             try
             {
@@ -738,7 +810,7 @@ namespace ParticleHoleCalculator
                     var tmp = unit.atomsData[_index - 1];
                     logger(_loggerT.None, $"id\ttype\tx\ty\tz{Environment.NewLine}"
                     + $"{tmp.id}\t{tmp.type}\t{tmp.pos.x}\t{tmp.pos.y}\t{tmp.pos.z}{Environment.NewLine}");
-                    logger(_loggerT.DEBUG, "Please input id to get atom data:");
+                    logger(_loggerT.DEBUG, $"Please input id to get atom data:");
                 }
             }
             catch
@@ -752,27 +824,23 @@ namespace ParticleHoleCalculator
             // 转化参数
             parameter _para = new parameter(args);
             bool DebugFlag = _para.IsNeedDebug();
-            // 模糊边长ABC
-            // ulong a = 15, b = 15, c = 15, atomLimit = 50;
 
             #region 初始化，系统检查
             if (Stopwatch.IsHighResolution)
-                logger(_loggerT.Success, "HRPC ENABLED{Environment.NewLine}");
+                logger(_loggerT.Success, $"HRPC ENABLED{Environment.NewLine}");
             else
-                logger(_loggerT.Fail, "high-resolution performance counter is not supported on this device{Environment.NewLine}");
+                logger(_loggerT.Fail, $"high-resolution performance counter is not supported on this device{Environment.NewLine}");
             logger(_loggerT.Info, $"TF:{Stopwatch.Frequency},ACC:{(1000L * 1000L * 1000L) / Stopwatch.Frequency} ns{Environment.NewLine}");
             #endregion
 
-            Stopwatch watch = new Stopwatch();
-            Stopwatch watchA = new Stopwatch();
+            Stopwatch watch = new Stopwatch(), watchSum = new Stopwatch();
 
             using (StreamReader lammp = _para.GetStreamReader())
-            using (StreamWriter newFile = _para.GetStreamWriter())
+            using (StreamWriter outputFile = _para.GetStreamWriter())
             {
-                watchA.Restart();
+                watchSum.Restart();
                 while (!lammp.EndOfStream)
                 {
-                    // SpinWait.SpinUntil(() => false, 2000);
                     #region 程序主结构
                     watch.Restart();
                     string input = String.Empty;
@@ -785,29 +853,57 @@ namespace ParticleHoleCalculator
                             switch (i)
                             {
                                 case 0:
-                                    Debug.Assert(input == "ITEM: TIMESTEP");
+                                    var StandString1 = "ITEM: TIMESTEP";
+                                    if (input != StandString1)
+                                        logger(_loggerT.Warning, $"此数据集时间戳格式可能有误:{input}{Environment.NewLine}正确格式应为{StandString1}{Environment.NewLine}");
                                     break;
                                 case 1:
                                     _timestep = Convert.ToUInt64(input);
                                     break;
                                 case 2:
-                                    Debug.Assert(input == "ITEM: NUMBER OF ATOMS");
+                                    var StandString2 = "ITEM: NUMBER OF ATOMS";
+                                    if (input != StandString2)
+                                        logger(_loggerT.Warning, $"此数据集原子个数格式可能有误:{input}{Environment.NewLine}正确格式应为{StandString2}{Environment.NewLine}");
                                     break;
                                 case 3:
                                     _atomsNum = Convert.ToUInt64(input);
                                     break;
                                 case 4:
-                                    Debug.Assert(input == "ITEM: BOX BOUNDS pp pp pp");
+                                    var StandString3 = "ITEM: BOX BOUNDS pp pp pp";
+                                    if (input != StandString3)
+                                        logger(_loggerT.Warning, $"此数据集边界格式可能有误:{input}{Environment.NewLine}正确格式应为{StandString3}{Environment.NewLine}");
                                     break;
                                 case 5:
                                 case 6:
                                 case 7:
-                                    // Convert.ToDouble(s)
-                                    _boxEdge[i - 5, 0] = Convert.ToDouble(input.Split(' ')[0]);
-                                    _boxEdge[i - 5, 1] = Convert.ToDouble(input.Split(' ')[1]);
+                                    try
+                                    {
+                                        _boxEdge[i - 5, 0] = Convert.ToDouble(input.Split(' ')[0]);
+                                        _boxEdge[i - 5, 1] = Convert.ToDouble(input.Split(' ')[1]);
+                                    }
+                                    catch (IndexOutOfRangeException IOOE)
+                                    {
+                                        logger(_loggerT.Fail, $"坐标数据不全\t{input}{Environment.NewLine}");
+                                        logger(_loggerT.DEBUG, $"{IOOE.Message}{Environment.NewLine}");
+                                        Environment.Exit(-1);
+                                    }
+                                    catch (FormatException FE)
+                                    {
+                                        logger(_loggerT.Fail, $"数据中坐标({input})非有效数字{Environment.NewLine}");
+                                        logger(_loggerT.DEBUG, $"{FE.Message}{Environment.NewLine}");
+                                        Environment.Exit(-1);
+                                    }
+                                    catch (OverflowException OFE)
+                                    {
+                                        logger(_loggerT.Fail, $"数据中坐标({input.Split(' ')[0]}),{input.Split(' ')[1]})超出范围{Environment.NewLine}");
+                                        logger(_loggerT.DEBUG, $"{OFE.Message}{Environment.NewLine}");
+                                        Environment.Exit(-1);
+                                    }
                                     break;
                                 case 8:
-                                    Debug.Assert(input == "ITEM: ATOMS id type x y z");
+                                    var StandString4 = "ITEM: ATOMS id type x y z";
+                                    if (input != StandString4)
+                                        logger(_loggerT.Warning, $"此数据集坐标格式可能有误:{input}{Environment.NewLine}正确格式应为{StandString4}{Environment.NewLine}");
                                     break;
                                 default:
                                     Debug.Assert(false);
@@ -830,7 +926,7 @@ namespace ParticleHoleCalculator
                             Debug.Assert(false);
                     #endregion
 
-                    logger(_loggerT.ANS, $"{unit.timestep} {unit.CountHole(_para.GetBoxSideLength(0), _para.GetBoxSideLength(1), _para.GetBoxSideLength(2), _para.GetDensity(), _para.GetThreshold())}{Environment.NewLine}");
+                    logger(_loggerT.ANS, $"{unit.timestep} {unit.CountHoleAndOutputFile(_para.GetBoxSideLength(0), _para.GetBoxSideLength(1), _para.GetBoxSideLength(2), _para.GetDensity(), _para.GetThreshold(), outputFile)}");
                     logger(_loggerT.None, $"{Environment.NewLine}");
 #if debug
                 disUnitInfo(unit);
@@ -839,13 +935,13 @@ namespace ParticleHoleCalculator
                     logger(_loggerT.Note, $"TIME:{(double)watch.ElapsedMilliseconds / 1000:0.0000} secs{Environment.NewLine}");
                     #endregion
                 }
-                watchA.Stop();
-                logger(_loggerT.Note, $"TOTAL_TIME:{(double)watchA.ElapsedMilliseconds / 1000:0.0000} secs{Environment.NewLine}");
-                Console.WriteLine($"TOTAL_TIME:{(double)watchA.ElapsedMilliseconds / 1000:0.0000} secs{Environment.NewLine}");
+                watchSum.Stop();
+                logger(_loggerT.Note, $"TOTAL_TIME:{(double)watchSum.ElapsedMilliseconds / 1000:0.0000} secs{Environment.NewLine}");
+                Console.WriteLine($"TOTAL_TIME:{(double)watchSum.ElapsedMilliseconds / 1000:0.0000} secs{Environment.NewLine}");
             }
-
-            logger(_loggerT.Note, "Press any key to exit.");
-            System.Console.ReadKey();
+            SpinWait.SpinUntil(() => false, 500);
+            //logger(_loggerT.Note, $"");
+            //System.Console.ReadKey();
         }
     }
 

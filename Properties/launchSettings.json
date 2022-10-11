@@ -2,7 +2,7 @@
   "profiles": {
     "ParticleHoleCalculator": {
       "commandName": "Project",
-      "commandLineArgs": "-i C:\\Users\\T_VISION\\Desktop1\\ParticleHoleCalculator\\dump2.9in -o ./out.txt -b 8,8,8 -d 3 -t 1"
+      "commandLineArgs": "-i C:\\Users\\T_VISION\\Desktop1\\ParticleHoleCalculator\\dump2 -o C:\\Users\\T_VISION\\Desktop1\\ParticleHoleCalculator\\out.txt -b 16,16,16 -d 24 -t 0"
     }
   }
 }
