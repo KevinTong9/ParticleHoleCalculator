@@ -13,6 +13,11 @@ namespace ParticleHoleCalculator
     class Program
     {
         /// <summary>
+        /// 递归深度
+        /// </summary>
+        private static readonly int MAX_DEPTH = 100;
+
+        /// <summary>
         /// 存放可接受参数
         /// </summary>
         private static class _parameter
@@ -114,7 +119,7 @@ namespace ParticleHoleCalculator
             {
                 foreach (var item in args)
                     logger(_loggerT.None, item + " ");
-                
+
                 if (isArgsLegal(args))
                 {
                     for (var i = 0; i < args.Length; i++)
@@ -527,7 +532,7 @@ namespace ParticleHoleCalculator
             /// <param name="c">模糊箱长z</param>
             /// <param name="atomLimit">模糊箱粒子个数</param>
             /// <returns></returns>
-            public ulong CountHole(ulong a, ulong b, ulong c, ulong atomLimit,ulong threshold)
+            public ulong CountHole(ulong a, ulong b, ulong c, ulong atomLimit, ulong threshold)
             {
                 // 各轴分离箱数
                 ulong x_n = (ulong)(Math.Abs(boxEdge[0, 1] - boxEdge[0, 0])) / a;
@@ -624,7 +629,22 @@ namespace ParticleHoleCalculator
                         for (long k = 0; (ulong)k < z_n; k++)
                             if (box_score[i, j, k])
                             {
-                                var result = frontBFS(ref box_score, new long[] { i, j, k });
+                                var result = frontBFS(ref box_score, new long[] { i, j, k }, 0);
+                                var tmpResult = result;
+                                while (true)
+                                {
+                                    var moreResult = new List<dot>();
+                                    foreach (var item in tmpResult)
+                                        if ((long)item.x > i && (long)item.y > j && (long)item.z > k)
+                                            moreResult.AddRange(frontBFS(ref box_score, new long[] { (long)item.x, (long)item.y, (long)item.z }, 0));
+                                    if (moreResult.Count == 0)
+                                    { break; }
+                                    else
+                                    {
+                                        result.AddRange(moreResult);
+                                        tmpResult = moreResult;
+                                    }
+                                };
                                 if ((ulong)result.Count > threshold)
                                 {
                                     holesNum++;
@@ -650,22 +670,22 @@ namespace ParticleHoleCalculator
             }
         }
         /// <summary>
-        /// 返回连接的所有为T的坐标集
+        /// 返回连接的所有为T的坐标集,一次最多深度为MAX_DEPTH,防止stack overflow，会截止，数据会不全，需多次遍历
         /// </summary>
         /// <param name="box_score">三维BC分类表bool[x,y,z]</param>
         /// <param name="loc">初始坐标{x,y,z}</param>
         /// <returns></returns>
-        static List<dot> frontBFS(ref bool[,,] box_score, long[] loc)
+        static List<dot> frontBFS(ref bool[,,] box_score, long[] loc, int depth)
         {
             //logger(_loggerT.None, $"{loc[0]},{loc[1]},{loc[2]}\t");
             List<dot> dots = new List<dot>();
-            Debug.Assert(box_score[loc[0], loc[1], loc[2]]);
-            box_score[loc[0], loc[1], loc[2]] = false;
-
-            logger(_loggerT.DEBUG, $"ADD dot[{loc[0]}, {loc[1]}, {loc[2]}]{Environment.NewLine}");
-
-            dots.Add(new dot(loc[0], loc[1], loc[2]));
-
+            //Debug.Assert(box_score[loc[0], loc[1], loc[2]]);
+            if (box_score[loc[0], loc[1], loc[2]])
+            {
+                //logger(_loggerT.DEBUG, $"ADD dot[{loc[0]}, {loc[1]}, {loc[2]}]{Environment.NewLine}");
+                box_score[loc[0], loc[1], loc[2]] = false;
+                dots.Add(new dot(loc[0], loc[1], loc[2]));
+            }
             for (ulong i = 0; i < 3; i++)
             {
                 var x = loc[0] + (i == 0 ? 1 : 0);
@@ -678,9 +698,8 @@ namespace ParticleHoleCalculator
                     z = (i == 2 ? 0 : z);
                 }
                 if (box_score[x, y, z])
-                    foreach (var item in frontBFS(ref box_score, new long[] { x, y, z }))
-                        dots.Add(item);
-
+                    if (depth < MAX_DEPTH)
+                        dots.AddRange(frontBFS(ref box_score, new long[] { x, y, z }, ++depth));
 
                 x = loc[0] - (i == 0 ? 1 : 0);
                 y = loc[1] - (i == 1 ? 1 : 0);
@@ -692,8 +711,8 @@ namespace ParticleHoleCalculator
                     z = (i == 2 ? box_score.GetLength((int)i) - 1 : z);
                 }
                 if (box_score[x, y, z])
-                    foreach (var item in frontBFS(ref box_score, new long[] { x, y, z }))
-                        dots.Add(item);
+                    if (depth < MAX_DEPTH)
+                        dots.AddRange(frontBFS(ref box_score, new long[] { x, y, z }, ++depth));
             }
             return dots;
         }
