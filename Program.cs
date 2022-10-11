@@ -15,7 +15,7 @@ namespace ParticleHoleCalculator
         /// 递归深度
         /// </summary>
         private static readonly int MAX_DEPTH = 100;
-
+        private static bool ISDEBUG = true;
         /// <summary>
         /// 存放可接受参数
         /// </summary>
@@ -28,7 +28,7 @@ namespace ParticleHoleCalculator
             /// <summary>
             /// -d/--DEBUG      调试
             /// </summary>
-            public const string debugArg1 = "-D", debugArg2 = "--Debug";
+            public const string debugArg1 = "-ND", debugArg2 = "--NoDebug";
             /// <summary>
             /// -i/--in         输入文件*
             /// </summary>
@@ -59,7 +59,28 @@ namespace ParticleHoleCalculator
             private static ulong[] boxSideLength = new ulong[3] { 8, 8, 8 };
             private static ulong density = 3;
             private static ulong threshold = 1;
-            private const string helpInfo = "this is help message?{Environment.NewLine}";
+            private const string helpInfo = "用法：ParticleHoleCalculator -i dump.lammpstrj -o dump_out_hole.lammpstrj [选项]... [参数]...\r\n" +
+                "#该程序依赖高IO，若使用较快磁盘可有效改善程序运行速率#\r\n" +
+                "根据dump.lammpstrj文件数据，以孔洞类别分类粒子，终端显示孔洞数与各类粒子占比，并输出同类型可视化文件dump_out_hole.lammpstrj\r\n" +
+                "默认开启DEBUG详细回显（可关闭以增强速度）\r\n" +
+                "如果不指定参数则取默认参数\r\n" +
+                "\r\n" +
+                "各参数对长短选项同时适用，多同参数使用时参照后者参数。\r\n" +
+                "  -h, --Help\t\t\t显示帮助信息\r\n" +
+                "  -ND, --NoDebug\t\t取消详细回显\r\n" +
+                "  -i <FILE>, --in <FILE>\t输入文件路径*\r\n" +
+                "  -o <FILE>, --out <FILE>\t输出文件路径*\r\n" +
+                "  -b <a,b,c>, --box <a,b,c>\t微元规格（长，宽，高，英文逗号分隔，只接受正整数）\r\n" +
+                "\t\t\t\t\t注：调参时若微元边长差过小可能会产生无效调参\r\n" +
+                "\t\t\t\t\t默认值：8,8,8\r\n" +
+                "  -d <d>, --density <d>\t\t单微元内含粒子数阈值（只接受自然数）\r\n" +
+                "\t\t\t\t\t注:超出部分视作实心区，小于等于此值视为孔洞区\r\n" +
+                "\t\t\t\t\t默认值：3\r\n" +
+                "  -t <t>, --threshold <t>\t微元链结个数阈值（只接受自然数）\r\n" +
+                "\t\t\t\t\t注：当孔洞含有微元数大于此值时才被视作孔洞，否则会被丢弃\r\n" +
+                "\t\t\t\t\t默认值：1\r\n"+
+                "\r\n" +
+                "例:./ParticleHoleCalculator  -i ./dump2 -o ./out.txt -b 10,10,10 -d 20 -t 2 -ND";
             /// <summary>
             /// 初步判断参数是否符合输入结构
             /// </summary>
@@ -116,9 +137,6 @@ namespace ParticleHoleCalculator
             /// <param name="args"></param>
             public parameter(string[] args)
             {
-                foreach (var item in args)
-                    logger(_loggerT.None, item + " ");
-
                 if (isArgsLegal(args))
                 {
                     for (var i = 0; i < args.Length; i++)
@@ -302,11 +320,6 @@ namespace ParticleHoleCalculator
                                 try
                                 {
                                     threshold = Convert.ToUInt64(args[i]);
-                                    if (threshold == 0)
-                                    {
-                                        logger(_loggerT.Fail, $"箱数阈值不能为0{Environment.NewLine}");
-                                        Environment.Exit(-1);
-                                    }
                                 }
                                 catch (FormatException FE)
                                 {
@@ -353,62 +366,71 @@ namespace ParticleHoleCalculator
         /// <param name="inf">记录信息</param>
         private static void logger(_loggerT type, string inf)
         {
-            /// <summary>
-            /// 各类型提示色
-            /// </summary>
-            ConsoleColor InfoBackColor = Console.BackgroundColor, InfoForeColor = ConsoleColor.DarkGreen;
-            ConsoleColor NoteBackColor = Console.BackgroundColor, NoteForeColor = ConsoleColor.Cyan;
-            ConsoleColor SuccessBackColor = Console.BackgroundColor, SuccessForeColor = ConsoleColor.DarkGreen;
-            ConsoleColor FailBackColor = Console.BackgroundColor, FailForeColor = ConsoleColor.Red;
-            ConsoleColor DEBUGBackColor = Console.BackgroundColor, DEBUGForeColor = ConsoleColor.DarkGray;
-            ConsoleColor WarningBackColor = Console.BackgroundColor, WarningForeColor = ConsoleColor.DarkBlue;
-            ConsoleColor AlertBackColor = Console.BackgroundColor, AlertForeColor = ConsoleColor.Yellow;
-            ConsoleColor ANSBackColor = ConsoleColor.White, ANSForeColor = ConsoleColor.Black;
             switch (type)
             {
                 case _loggerT.Info:
+                    ConsoleColor InfoBackColor = Console.BackgroundColor, InfoForeColor = ConsoleColor.DarkGreen;
                     Console.BackgroundColor = InfoBackColor;
                     Console.ForegroundColor = InfoForeColor;
                     Console.Write($"[INFO] {inf}");
                     Console.ResetColor();
                     break;
                 case _loggerT.Note:
-                    Console.BackgroundColor = NoteBackColor;
-                    Console.ForegroundColor = NoteForeColor;
-                    Console.Write($"[NOTE] {inf}");
-                    Console.ResetColor();
+                    if (ISDEBUG)
+                    {
+                        ConsoleColor NoteBackColor = Console.BackgroundColor, NoteForeColor = ConsoleColor.Cyan;
+                        Console.BackgroundColor = NoteBackColor;
+                        Console.ForegroundColor = NoteForeColor;
+                        Console.Write($"[NOTE] {inf}");
+                        Console.ResetColor();
+                    }
                     break;
                 case _loggerT.Success:
+                    ConsoleColor SuccessBackColor = Console.BackgroundColor, SuccessForeColor = ConsoleColor.Magenta;
                     Console.BackgroundColor = SuccessBackColor;
                     Console.ForegroundColor = SuccessForeColor;
                     Console.Write($"[+] {inf}");
                     Console.ResetColor();
                     break;
                 case _loggerT.Fail:
+                    ConsoleColor FailBackColor = Console.BackgroundColor, FailForeColor = ConsoleColor.Red;
                     Console.BackgroundColor = FailBackColor;
                     Console.ForegroundColor = FailForeColor;
                     Console.Write($"[-] {inf}");
                     Console.ResetColor();
                     break;
                 case _loggerT.DEBUG:
-                    Console.BackgroundColor = DEBUGBackColor;
-                    Console.ForegroundColor = DEBUGForeColor;
-                    Console.Write($"[DEBUG]: {inf}");
-                    Console.ResetColor();
+                    if (ISDEBUG)
+                    {
+                        ConsoleColor DEBUGBackColor = Console.BackgroundColor, DEBUGForeColor = ConsoleColor.DarkGray;
+                        Console.BackgroundColor = DEBUGBackColor;
+                        Console.ForegroundColor = DEBUGForeColor;
+                        Console.Write($"[DEBUG]: {inf}");
+                        Console.ResetColor();
+                    }
                     break;
                 case _loggerT.Warning:
-                    Console.BackgroundColor = WarningBackColor;
-                    Console.ForegroundColor = WarningForeColor;
-                    Console.Write($"[WARNING] {inf}");
-                    Console.ResetColor();
+                    if (ISDEBUG)
+                    {
+                        ConsoleColor WarningBackColor = Console.BackgroundColor, WarningForeColor = ConsoleColor.DarkBlue;
+                        Console.BackgroundColor = WarningBackColor;
+                        Console.ForegroundColor = WarningForeColor;
+                        Console.Write($"[WARNING] {inf}");
+                        Console.ResetColor();
+                    }
                     break;
                 case _loggerT.Alert:
-                    Console.BackgroundColor = AlertBackColor;
-                    Console.ForegroundColor = AlertForeColor;
-                    Console.Write($"[AlERT] {inf}");
-                    Console.ResetColor();
+                    if (ISDEBUG)
+                    {
+                        ConsoleColor AlertBackColor = Console.BackgroundColor, AlertForeColor = ConsoleColor.Yellow;
+                        Console.BackgroundColor = AlertBackColor;
+                        Console.ForegroundColor = AlertForeColor;
+                        Console.Write($"[AlERT] {inf}");
+                        Console.ResetColor();
+                    }
                     break;
                 case _loggerT.ANS:
+                    ConsoleColor ANSBackColor = ConsoleColor.White, ANSForeColor = ConsoleColor.Black;
                     Console.BackgroundColor = ANSBackColor;
                     Console.ForegroundColor = ANSForeColor;
                     Console.Write($"[ANSWER] {inf}");
@@ -487,7 +509,10 @@ namespace ParticleHoleCalculator
                     logger(_loggerT.Warning, $"此数据集坐标数据量不足:{input}{Environment.NewLine}");
                     Environment.Exit(-1);
                 }
-
+                else if (_input.Length > 5)
+                {
+                    logger(_loggerT.Warning, $"此数据集坐标有多余数据");
+                }
                 ulong _id;
                 int _type;
                 double _x, _y, _z;
@@ -568,17 +593,22 @@ namespace ParticleHoleCalculator
             /// <param name="a">模糊箱长</param>
             /// <param name="b">模糊箱宽</param>
             /// <param name="c">模糊箱高</param>
-            /// <param name="atomLimit">粒子密度</param>
+            /// <param name="boxDensity">粒子密度</param>
             /// <param name="threshold">孔洞箱阈值 </param>
             /// <param name="outFile">输出文件流</param>
             /// <returns></returns>
-            public ulong CountHoleAndOutputFile(ulong a, ulong b, ulong c, ulong atomLimit, ulong threshold, StreamWriter outFile)
+            public ulong CountHoleAndOutputFile(ulong a, ulong b, ulong c, ulong boxDensity, ulong threshold, StreamWriter outFile)
             {
                 // 边长模糊算法
                 // 各轴分离箱数
                 ulong x_n = (ulong)(Math.Abs(boxEdge[0, 1] - boxEdge[0, 0])) / a;
                 ulong y_n = (ulong)(Math.Abs(boxEdge[1, 1] - boxEdge[1, 0])) / b;
                 ulong z_n = (ulong)(Math.Abs(boxEdge[2, 1] - boxEdge[2, 0])) / c;
+                if (x_n == 0 || y_n == 0 || z_n == 0)
+                {
+                    logger(_loggerT.Fail, $"微元箱体过大，超出边界");
+                    Environment.Exit(-1);
+                }
                 // 各轴箱单位长
                 double x_i = Math.Abs(boxEdge[0, 1] - boxEdge[0, 0]) / (double)(x_n);
                 double y_i = Math.Abs(boxEdge[1, 1] - boxEdge[1, 0]) / (double)(y_n);
@@ -644,7 +674,7 @@ namespace ParticleHoleCalculator
                 for (ulong i = 0; i < x_n; i++)
                     for (ulong j = 0; j < y_n; j++)
                         for (ulong k = 0; k < z_n; k++)
-                            box_score[i, j, k] = ((ulong)(box[(int)i][(int)j][(int)k].Count) <= atomLimit);
+                            box_score[i, j, k] = ((ulong)(box[(int)i][(int)j][(int)k].Count) <= boxDensity);
                 #endregion
 #if debug
                 for (ulong i = 0; i < x_n; i++)
@@ -668,6 +698,7 @@ namespace ParticleHoleCalculator
                 #region 前端BFS算法&输出
                 ulong holesNum = 0;
                 ATOM[] atomsArr = atomsData;
+                ulong type1Counter = 0, type2Counter = 0;
                 for (int p = 0; p < atomsArr.Length; p++)
                     atomsArr[p].type = -1;
 
@@ -716,10 +747,13 @@ namespace ParticleHoleCalculator
                                             if (isType1) type1Num++; else type2Num++;
                                         }
                                     }
-                                    logger(_loggerT.Info, $"AtomNum:{type1Num + type2Num}\ttype1Num:{type1Num}\\{((double)type1Num * 100 / (double)(type1Num + type2Num)):0.00}%\ttype2Num:{type2Num}\\{((double)type2Num * 100 / (double)(type1Num + type2Num)):0.00}%{Environment.NewLine}");
+                                    type1Counter += type1Num;
+                                    type2Counter += type2Num;
+                                    logger(_loggerT.DEBUG, $"BoxNum:{type1Num + type2Num}\ttype1(n/o):{type1Num}\\{((double)type1Num * 100 / (double)(type1Num + type2Num)):0.00}%\ttype2(n/o):{type2Num}\\{((double)type2Num * 100 / (double)(type1Num + type2Num)):0.00}%{Environment.NewLine}");
                                 }
                                 #endregion
                             }
+                logger(_loggerT.Info, $"AtomNum:{type1Counter + type2Counter}\ttype1(n/o):{type1Counter}\\{((double)type1Counter * 100 / (double)(type1Counter + type2Counter)):0.00}%\ttype2(n/o):{type2Counter}\\{((double)type2Counter * 100 / (double)(type1Counter + type2Counter)):0.00}%{Environment.NewLine}");
                 outFile.Write($"ITEM: TIMESTEP{Environment.NewLine}" +
                                        $"{timestep}{Environment.NewLine}" +
                                        $"ITEM: NUMBER OF ATOMS{Environment.NewLine}" +
@@ -729,7 +763,6 @@ namespace ParticleHoleCalculator
                                        $"{boxEdge[1, 0]:0.0000000000000000e+00} {boxEdge[1, 1]:0.0000000000000000e+00}{Environment.NewLine}" +
                                        $"{boxEdge[2, 0]:0.0000000000000000e+00} {boxEdge[2, 1]:0.0000000000000000e+00}{Environment.NewLine}" +
                                        $"ITEM: ATOMS id type x y z{Environment.NewLine}");
-                logger(_loggerT.DEBUG, $"CCC:{atomsArr.Length}\n");
                 for (int p = 0; p < atomsArr.Length; p++)
                 {
                     outFile.WriteLine(atomsArr[p].ToString());
@@ -823,14 +856,14 @@ namespace ParticleHoleCalculator
         {
             // 转化参数
             parameter _para = new parameter(args);
-            bool DebugFlag = _para.IsNeedDebug();
+            ISDEBUG = _para.IsNeedDebug();
 
             #region 初始化，系统检查
             if (Stopwatch.IsHighResolution)
                 logger(_loggerT.Success, $"HRPC ENABLED{Environment.NewLine}");
             else
                 logger(_loggerT.Fail, $"high-resolution performance counter is not supported on this device{Environment.NewLine}");
-            logger(_loggerT.Info, $"TF:{Stopwatch.Frequency},ACC:{(1000L * 1000L * 1000L) / Stopwatch.Frequency} ns{Environment.NewLine}");
+            logger(_loggerT.Success, $"TF:{Stopwatch.Frequency},ACC:{(1000L * 1000L * 1000L) / Stopwatch.Frequency} ns{Environment.NewLine}");
             #endregion
 
             Stopwatch watch = new Stopwatch(), watchSum = new Stopwatch();
@@ -932,11 +965,11 @@ namespace ParticleHoleCalculator
                 disUnitInfo(unit);
 #endif
                     watch.Stop();
-                    logger(_loggerT.Note, $"TIME:{(double)watch.ElapsedMilliseconds / 1000:0.0000} secs{Environment.NewLine}");
+                    logger(_loggerT.Success, $"TIME:{(double)watch.ElapsedMilliseconds / 1000:0.0000} secs{Environment.NewLine}{Environment.NewLine}");
                     #endregion
                 }
                 watchSum.Stop();
-                logger(_loggerT.Note, $"TOTAL_TIME:{(double)watchSum.ElapsedMilliseconds / 1000:0.0000} secs{Environment.NewLine}");
+                logger(_loggerT.Success, $"TOTAL_TIME:{(double)watchSum.ElapsedMilliseconds / 1000:0.0000} secs{Environment.NewLine}");
                 Console.WriteLine($"TOTAL_TIME:{(double)watchSum.ElapsedMilliseconds / 1000:0.0000} secs{Environment.NewLine}");
             }
             SpinWait.SpinUntil(() => false, 500);
