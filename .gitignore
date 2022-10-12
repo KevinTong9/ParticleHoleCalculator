@@ -6,6 +6,8 @@ obj/
 out.txt
 test.ipynb
 dump2
-Publish/
-Publish2/
+Publish*/
 out
+out1.*
+out2.*
+out3.*

@@ -15,7 +15,7 @@ namespace ParticleHoleCalculator
         /// 递归深度
         /// </summary>
         private static readonly int MAX_DEPTH = 100;
-        private static bool ISDEBUG = true;
+        private static bool ISDEBUG = false;
         /// <summary>
         /// 存放可接受参数
         /// </summary>
@@ -28,15 +28,23 @@ namespace ParticleHoleCalculator
             /// <summary>
             /// -d/--DEBUG      调试
             /// </summary>
-            public const string debugArg1 = "-ND", debugArg2 = "--NoDebug";
+            public const string debugArg1 = "-D", debugArg2 = "--Debug";
             /// <summary>
             /// -i/--in         输入文件*
             /// </summary>
             public const string fileInputArg1 = "-i", fileInputArg2 = "--in";
             /// <summary>
-            /// o/--out         输出文件
+            /// -o1/--out1      不同时间戳时孔洞总览
             /// </summary>
-            public const string fileOutArg1 = "-o", fileOutArg2 = "--out";
+            public const string fileOut1Arg1 = "-o1", fileOut1Arg2 = "--out1";
+            /// <summary>
+            /// -o2/--out2      不同时间戳时各孔洞信息文件输出
+            /// </summary>
+            public const string fileOut2Arg1 = "-o2", fileOut2Arg2 = "--out2";
+            /// <summary>
+            /// -o3/--out3      不同时间戳时总粒子详细可视化文件输出
+            /// </summary>
+            public const string fileOut3Arg1 = "-o3", fileOut3Arg2 = "--out3";
             /// <summary>
             /// -b/--box        箱体模糊长(a,b,c)
             /// </summary>
@@ -55,21 +63,25 @@ namespace ParticleHoleCalculator
         {
             private static bool needDebug;
             private static StreamReader inputFile;
-            private static StreamWriter outputFile;// = new ($@"{Environment.CurrentDirectory}\out.txt");
+            private static StreamWriter outputFile1;
+            private static StreamWriter outputFile2;
+            private static StreamWriter outputFile3;
             private static ulong[] boxSideLength = new ulong[3] { 8, 8, 8 };
             private static ulong density = 3;
             private static ulong threshold = 1;
             private const string helpInfo = "用法：ParticleHoleCalculator -i dump.lammpstrj -o dump_out_hole.lammpstrj [选项]... [参数]...\r\n" +
                 "#该程序依赖高IO，若使用较快磁盘可有效改善程序运行速率#\r\n" +
                 "根据dump.lammpstrj文件数据，以孔洞类别分类粒子，终端显示孔洞数与各类粒子占比，并输出同类型可视化文件dump_out_hole.lammpstrj\r\n" +
-                "默认开启DEBUG详细回显（可关闭以增强速度）\r\n" +
+                "默认关闭DEBUG详细回显（开启会降低速度）\r\n" +
                 "如果不指定参数则取默认参数\r\n" +
                 "\r\n" +
                 "各参数对长短选项同时适用，多同参数使用时参照后者参数。\r\n" +
                 "  -h, --Help\t\t\t显示帮助信息\r\n" +
-                "  -ND, --NoDebug\t\t取消详细回显\r\n" +
+                "  -ND, --NoDebug\t\t开启详细回显\r\n" +
                 "  -i <FILE>, --in <FILE>\t输入文件路径*\r\n" +
-                "  -o <FILE>, --out <FILE>\t输出文件路径*\r\n" +
+                "  -o1 <FILE>, --out1 <FILE>\t不同时间戳时孔洞总览文件输出*\r\n" +
+                "  -o2 <FILE>, --out2 <FILE>\t不同时间戳时各孔洞信息文件输出*\r\n" +
+                "  -o3 <FILE>, --out3 <FILE>\t不同时间戳时总粒子详细可视化文件输出*\r\n" +
                 "  -b <a,b,c>, --box <a,b,c>\t微元规格（长，宽，高，英文逗号分隔，只接受正整数）\r\n" +
                 "\t\t\t\t\t注：调参时若微元边长差过小可能会产生无效调参\r\n" +
                 "\t\t\t\t\t默认值：8,8,8\r\n" +
@@ -78,9 +90,9 @@ namespace ParticleHoleCalculator
                 "\t\t\t\t\t默认值：3\r\n" +
                 "  -t <t>, --threshold <t>\t微元链结个数阈值（只接受自然数）\r\n" +
                 "\t\t\t\t\t注：当孔洞含有微元数大于此值时才被视作孔洞，否则会被丢弃\r\n" +
-                "\t\t\t\t\t默认值：1\r\n"+
+                "\t\t\t\t\t默认值：1\r\n" +
                 "\r\n" +
-                "例:./ParticleHoleCalculator  -i ./dump2 -o ./out.txt -b 10,10,10 -d 20 -t 2 -ND";
+                "例:./ParticleHoleCalculator  -i ./dump2 -o1 ./out1.txt -o2 ./out2.txt -o3 ./out3.txt -b 10,10,10 -d 20 -t 2 -ND";
             /// <summary>
             /// 初步判断参数是否符合输入结构
             /// </summary>
@@ -102,8 +114,12 @@ namespace ParticleHoleCalculator
                                 break;
                             case _parameter.fileInputArg1:
                             case _parameter.fileInputArg2:
-                            case _parameter.fileOutArg1:
-                            case _parameter.fileOutArg2:
+                            case _parameter.fileOut1Arg1:
+                            case _parameter.fileOut1Arg2:
+                            case _parameter.fileOut2Arg1:
+                            case _parameter.fileOut2Arg2:
+                            case _parameter.fileOut3Arg1:
+                            case _parameter.fileOut3Arg2:
                             case _parameter.boxArg1:
                             case _parameter.boxArg2:
                             case _parameter.densityArg1:
@@ -127,7 +143,7 @@ namespace ParticleHoleCalculator
             /// <returns></returns>
             private bool isArgsFull()
             {
-                if (inputFile == null || outputFile == null)
+                if (inputFile == null || outputFile1 == null || outputFile2 == null || outputFile3 == null)
                     return false;
                 return true;
             }
@@ -197,47 +213,147 @@ namespace ParticleHoleCalculator
                                 }
                                 break;
                             #endregion
-                            case _parameter.fileOutArg1:
-                            case _parameter.fileOutArg2:
-                                #region 输出文件配置
+                            case _parameter.fileOut1Arg1:
+                            case _parameter.fileOut1Arg2:
+                                #region 不同时间戳时孔洞总览
                                 i++;
                                 try
                                 {
-                                    outputFile = new StreamWriter(@$"{args[i]}", false);
+                                    outputFile1 = new StreamWriter(@$"{args[i]}", false);
                                 }
                                 catch (UnauthorizedAccessException UAE)
                                 {
-                                    logger(_loggerT.Fail, $"无法创建文件，文件权限不足{Environment.NewLine}");
+                                    logger(_loggerT.Fail, $"无法创建文件1，文件权限不足，请检查--out1参数{Environment.NewLine}");
                                     logger(_loggerT.DEBUG, $"{UAE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (ArgumentException AE)
                                 {
-                                    logger(_loggerT.Fail, $"无输出文件{Environment.NewLine}");
+                                    logger(_loggerT.Fail, $"无输出文件，请检查--out1参数{Environment.NewLine}");
                                     logger(_loggerT.DEBUG, $"{AE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (DirectoryNotFoundException DNFE)
                                 {
-                                    logger(_loggerT.Fail, $"指定的路径无效{Environment.NewLine}");
+                                    logger(_loggerT.Fail, $"指定的路径无效，请检查--out1参数{Environment.NewLine}");
                                     logger(_loggerT.DEBUG, $"{DNFE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (PathTooLongException PTLE)
                                 {
-                                    logger(_loggerT.Fail, $"输出文件名过长{Environment.NewLine}");
+                                    logger(_loggerT.Fail, $"输出文件名过长，请检查--out1参数{Environment.NewLine}");
                                     logger(_loggerT.DEBUG, $"{PTLE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (IOException IOE)
                                 {
-                                    logger(_loggerT.Fail, $"输出文件文件名非法{Environment.NewLine}");
+                                    logger(_loggerT.Fail, $"输出文件文件名非法，请检查--out1参数{Environment.NewLine}");
                                     logger(_loggerT.DEBUG, $"{IOE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
                                 catch (SecurityException SE)
                                 {
-                                    logger(_loggerT.Fail, $"无权限输出文件{Environment.NewLine}");
+                                    logger(_loggerT.Fail, $"无权限输出文件，请检查--out1参数{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{SE.Message}{Environment.NewLine}");
+                                    Environment.Exit(-1);
+                                }
+                                finally
+                                {
+
+                                }
+                                break;
+                            #endregion
+                            case _parameter.fileOut2Arg1:
+                            case _parameter.fileOut2Arg2:
+                                #region 不同时间戳时各孔洞信息文件输出
+                                i++;
+                                try
+                                {
+                                    outputFile2 = new StreamWriter(@$"{args[i]}", false);
+                                }
+                                catch (UnauthorizedAccessException UAE)
+                                {
+                                    logger(_loggerT.Fail, $"无法创建文件2，文件权限不足，请检查--out2参数{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{UAE.Message}{Environment.NewLine}");
+                                    Environment.Exit(-1);
+                                }
+                                catch (ArgumentException AE)
+                                {
+                                    logger(_loggerT.Fail, $"无输出文件，请检查--out2参数{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{AE.Message}{Environment.NewLine}");
+                                    Environment.Exit(-1);
+                                }
+                                catch (DirectoryNotFoundException DNFE)
+                                {
+                                    logger(_loggerT.Fail, $"指定的路径无效，请检查--out2参数{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{DNFE.Message}{Environment.NewLine}");
+                                    Environment.Exit(-1);
+                                }
+                                catch (PathTooLongException PTLE)
+                                {
+                                    logger(_loggerT.Fail, $"输出文件名过长，请检查--out2参数{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{PTLE.Message}{Environment.NewLine}");
+                                    Environment.Exit(-1);
+                                }
+                                catch (IOException IOE)
+                                {
+                                    logger(_loggerT.Fail, $"输出文件文件名非法，请检查--out2参数{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{IOE.Message}{Environment.NewLine}");
+                                    Environment.Exit(-1);
+                                }
+                                catch (SecurityException SE)
+                                {
+                                    logger(_loggerT.Fail, $"无权限输出文件，请检查--out2参数{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{SE.Message}{Environment.NewLine}");
+                                    Environment.Exit(-1);
+                                }
+                                finally
+                                {
+
+                                }
+                                break;
+                            #endregion
+                            case _parameter.fileOut3Arg1:
+                            case _parameter.fileOut3Arg2:
+                                #region 不同时间戳时总粒子详细可视化文件输出
+                                i++;
+                                try
+                                {
+                                    outputFile3 = new StreamWriter(@$"{args[i]}", false);
+                                }
+                                catch (UnauthorizedAccessException UAE)
+                                {
+                                    logger(_loggerT.Fail, $"无法创建文件3，文件权限不足，请检查--out3参数{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{UAE.Message}{Environment.NewLine}");
+                                    Environment.Exit(-1);
+                                }
+                                catch (ArgumentException AE)
+                                {
+                                    logger(_loggerT.Fail, $"无输出文件，请检查--out3参数{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{AE.Message}{Environment.NewLine}");
+                                    Environment.Exit(-1);
+                                }
+                                catch (DirectoryNotFoundException DNFE)
+                                {
+                                    logger(_loggerT.Fail, $"指定的路径无效，请检查--out3参数{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{DNFE.Message}{Environment.NewLine}");
+                                    Environment.Exit(-1);
+                                }
+                                catch (PathTooLongException PTLE)
+                                {
+                                    logger(_loggerT.Fail, $"输出文件名过长，请检查--out3参数{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{PTLE.Message}{Environment.NewLine}");
+                                    Environment.Exit(-1);
+                                }
+                                catch (IOException IOE)
+                                {
+                                    logger(_loggerT.Fail, $"输出文件文件名非法，请检查--out3参数{Environment.NewLine}");
+                                    logger(_loggerT.DEBUG, $"{IOE.Message}{Environment.NewLine}");
+                                    Environment.Exit(-1);
+                                }
+                                catch (SecurityException SE)
+                                {
+                                    logger(_loggerT.Fail, $"无权限输出文件，请检查--out3参数{Environment.NewLine}");
                                     logger(_loggerT.DEBUG, $"{SE.Message}{Environment.NewLine}");
                                     Environment.Exit(-1);
                                 }
@@ -349,7 +465,9 @@ namespace ParticleHoleCalculator
             //public override string ToString() => $"{(needDebug?"已开启DEBUG模式{Environment.NewLine}":"")}输入文件：{in}";            public bool IsNeedHelp() => needAnyHelp;
             public bool IsNeedDebug() => needDebug;
             public StreamReader GetStreamReader() => inputFile;
-            public StreamWriter GetStreamWriter() => outputFile;
+            public StreamWriter GetStreamWriter1() => outputFile1;
+            public StreamWriter GetStreamWriter2() => outputFile2;
+            public StreamWriter GetStreamWriter3() => outputFile3;
             public ulong GetBoxSideLength(int i) => boxSideLength[i];
             public ulong GetDensity() => density;
             public ulong GetThreshold() => threshold;
@@ -369,11 +487,14 @@ namespace ParticleHoleCalculator
             switch (type)
             {
                 case _loggerT.Info:
-                    ConsoleColor InfoBackColor = Console.BackgroundColor, InfoForeColor = ConsoleColor.DarkGreen;
-                    Console.BackgroundColor = InfoBackColor;
-                    Console.ForegroundColor = InfoForeColor;
-                    Console.Write($"[INFO] {inf}");
-                    Console.ResetColor();
+                    if (ISDEBUG)
+                    {
+                        ConsoleColor InfoBackColor = Console.BackgroundColor, InfoForeColor = ConsoleColor.DarkGreen;
+                        Console.BackgroundColor = InfoBackColor;
+                        Console.ForegroundColor = InfoForeColor;
+                        Console.Write($"[INFO] {inf}");
+                        Console.ResetColor();
+                    }
                     break;
                 case _loggerT.Note:
                     if (ISDEBUG)
@@ -430,11 +551,14 @@ namespace ParticleHoleCalculator
                     }
                     break;
                 case _loggerT.ANS:
-                    ConsoleColor ANSBackColor = ConsoleColor.White, ANSForeColor = ConsoleColor.Black;
-                    Console.BackgroundColor = ANSBackColor;
-                    Console.ForegroundColor = ANSForeColor;
-                    Console.Write($"[ANSWER] {inf}");
-                    Console.ResetColor();
+                    if (ISDEBUG)
+                    {
+                        ConsoleColor ANSBackColor = ConsoleColor.White, ANSForeColor = ConsoleColor.Black;
+                        Console.BackgroundColor = ANSBackColor;
+                        Console.ForegroundColor = ANSForeColor;
+                        Console.Write($"[ANSWER] {inf}");
+                        Console.ResetColor();
+                    }
                     break;
                 default:
                     Console.BackgroundColor = Console.BackgroundColor;
@@ -595,9 +719,9 @@ namespace ParticleHoleCalculator
             /// <param name="c">模糊箱高</param>
             /// <param name="boxDensity">粒子密度</param>
             /// <param name="threshold">孔洞箱阈值 </param>
-            /// <param name="outFile">输出文件流</param>
+            /// <param name="outFile3">输出文件流</param>
             /// <returns></returns>
-            public ulong CountHoleAndOutputFile(ulong a, ulong b, ulong c, ulong boxDensity, ulong threshold, StreamWriter outFile)
+            public ulong CountHoleAndOutputFile(ulong a, ulong b, ulong c, ulong boxDensity, ulong threshold, StreamWriter outFile1, StreamWriter outFile2, StreamWriter outFile3)
             {
                 // 边长模糊算法
                 // 各轴分离箱数
@@ -630,10 +754,13 @@ namespace ParticleHoleCalculator
                 }
                 #endregion
 
+                ulong lType1Counter = 0, lType2Counter = 0;
+
                 #region 扔箱
                 for (ulong i = 0; i < this.atomsNum; i++)
                 {
                     var tar = this.atomsData[i];
+                    if (tar.type == 1) lType1Counter++; else lType2Counter++;
                     for (int j = 0; j < 3; j++)
                         Debug.Assert(boxEdge[j, 0] < boxEdge[j, 1]);
 #if debug
@@ -695,7 +822,18 @@ namespace ParticleHoleCalculator
                     logger(_loggerT.None, $"{Environment.NewLine}");
                 }
 #endif
-                #region 前端BFS算法&输出
+                #region 前端BFS算法 & 输出
+                outFile2.Write($"{timestep}");
+                outFile3.Write($"ITEM: TIMESTEP{Environment.NewLine}" +
+                                       $"{timestep}{Environment.NewLine}" +
+                                       $"ITEM: NUMBER OF ATOMS{Environment.NewLine}" +
+                                       $"{atomsNum}{Environment.NewLine}" +
+                                       $"ITEM: BOX BOUNDS pp pp pp{Environment.NewLine}" +
+                                       $"{boxEdge[0, 0]:0.0000000000000000e+00} {boxEdge[0, 1]:0.0000000000000000e+00}{Environment.NewLine}" +
+                                       $"{boxEdge[1, 0]:0.0000000000000000e+00} {boxEdge[1, 1]:0.0000000000000000e+00}{Environment.NewLine}" +
+                                       $"{boxEdge[2, 0]:0.0000000000000000e+00} {boxEdge[2, 1]:0.0000000000000000e+00}{Environment.NewLine}" +
+                                       $"ITEM: ATOMS id type x y z{Environment.NewLine}");
+
                 ulong holesNum = 0;
                 ATOM[] atomsArr = atomsData;
                 ulong type1Counter = 0, type2Counter = 0;
@@ -750,23 +888,16 @@ namespace ParticleHoleCalculator
                                     type1Counter += type1Num;
                                     type2Counter += type2Num;
                                     logger(_loggerT.DEBUG, $"BoxNum:{type1Num + type2Num}\ttype1(n/o):{type1Num}\\{((double)type1Num * 100 / (double)(type1Num + type2Num)):0.00}%\ttype2(n/o):{type2Num}\\{((double)type2Num * 100 / (double)(type1Num + type2Num)):0.00}%{Environment.NewLine}");
+                                    outFile2.Write($"\t{type1Num + type2Num}\t{type1Num}\t{type2Num}");
                                 }
                                 #endregion
                             }
+                outFile2.Write($"{Environment.NewLine}");
                 logger(_loggerT.Info, $"AtomNum:{type1Counter + type2Counter}\ttype1(n/o):{type1Counter}\\{((double)type1Counter * 100 / (double)(type1Counter + type2Counter)):0.00}%\ttype2(n/o):{type2Counter}\\{((double)type2Counter * 100 / (double)(type1Counter + type2Counter)):0.00}%{Environment.NewLine}");
-                outFile.Write($"ITEM: TIMESTEP{Environment.NewLine}" +
-                                       $"{timestep}{Environment.NewLine}" +
-                                       $"ITEM: NUMBER OF ATOMS{Environment.NewLine}" +
-                                       $"{atomsNum}{Environment.NewLine}" +
-                                       $"ITEM: BOX BOUNDS pp pp pp{Environment.NewLine}" +
-                                       $"{boxEdge[0, 0]:0.0000000000000000e+00} {boxEdge[0, 1]:0.0000000000000000e+00}{Environment.NewLine}" +
-                                       $"{boxEdge[1, 0]:0.0000000000000000e+00} {boxEdge[1, 1]:0.0000000000000000e+00}{Environment.NewLine}" +
-                                       $"{boxEdge[2, 0]:0.0000000000000000e+00} {boxEdge[2, 1]:0.0000000000000000e+00}{Environment.NewLine}" +
-                                       $"ITEM: ATOMS id type x y z{Environment.NewLine}");
+                outFile1.WriteLine($"{timestep}\t{holesNum}\t{type1Counter}\t{type2Counter}\t{lType1Counter - type1Counter}\t{lType2Counter-type2Counter}");
                 for (int p = 0; p < atomsArr.Length; p++)
-                {
-                    outFile.WriteLine(atomsArr[p].ToString());
-                }
+                    outFile3.WriteLine(atomsArr[p].ToString());
+                
                 //foreach (var item in atomsArr)
                 //outFile.WriteLine(item.ToString());
                 #endregion
@@ -869,9 +1000,13 @@ namespace ParticleHoleCalculator
             Stopwatch watch = new Stopwatch(), watchSum = new Stopwatch();
 
             using (StreamReader lammp = _para.GetStreamReader())
-            using (StreamWriter outputFile = _para.GetStreamWriter())
+            using (StreamWriter outputFile1 = _para.GetStreamWriter1())
+            using (StreamWriter outputFile2 = _para.GetStreamWriter2())
+            using (StreamWriter outputFile3 = _para.GetStreamWriter3())
             {
                 watchSum.Restart();
+                outputFile1.Write($"TIME\tBubblesNum\tBubblesType 1\tBubblesType 2\tLiquidType 1\tLiquidType 1{Environment.NewLine}");
+                outputFile2.Write($"TIME\tBub 1 Size\tBub 1 Type 1\tBub 1 Type 2\tBub 2 Size\tBub 2 Type 1\tBub 2 Type 2\tBub 3 Size\tBub 3 Type 1\tBub 3 Type 2{Environment.NewLine}");
                 while (!lammp.EndOfStream)
                 {
                     #region 程序主结构
@@ -958,19 +1093,18 @@ namespace ParticleHoleCalculator
                         else
                             Debug.Assert(false);
                     #endregion
-
-                    logger(_loggerT.ANS, $"{unit.timestep} {unit.CountHoleAndOutputFile(_para.GetBoxSideLength(0), _para.GetBoxSideLength(1), _para.GetBoxSideLength(2), _para.GetDensity(), _para.GetThreshold(), outputFile)}");
-                    logger(_loggerT.None, $"{Environment.NewLine}");
+                    logger(_loggerT.ANS, $"{unit.timestep} {unit.CountHoleAndOutputFile(_para.GetBoxSideLength(0), _para.GetBoxSideLength(1), _para.GetBoxSideLength(2), _para.GetDensity(), _para.GetThreshold(), outputFile1, outputFile2, outputFile3)}");
+                    if (ISDEBUG) logger(_loggerT.None, $"{Environment.NewLine}");
 #if debug
                 disUnitInfo(unit);
 #endif
                     watch.Stop();
-                    logger(_loggerT.Success, $"TIME:{(double)watch.ElapsedMilliseconds / 1000:0.0000} secs{Environment.NewLine}{Environment.NewLine}");
+                    logger(_loggerT.Info, $"TIME:{(double)watch.ElapsedMilliseconds / 1000:0.0000} secs{Environment.NewLine}{Environment.NewLine}");
                     #endregion
                 }
                 watchSum.Stop();
                 logger(_loggerT.Success, $"TOTAL_TIME:{(double)watchSum.ElapsedMilliseconds / 1000:0.0000} secs{Environment.NewLine}");
-                Console.WriteLine($"TOTAL_TIME:{(double)watchSum.ElapsedMilliseconds / 1000:0.0000} secs{Environment.NewLine}");
+
             }
             SpinWait.SpinUntil(() => false, 500);
             //logger(_loggerT.Note, $"");
