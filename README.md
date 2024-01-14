@@ -18,7 +18,7 @@
 
 各参数对长短选项同时适用，多同参数使用时参照后者参数。
   -h, --Help                    显示帮助信息
-  -ND, --NoDebug                开启详细回显
+  -D, -Debug                开启详细回显
   -i <FILE>, --in <FILE>        输入文件路径*
   -o1 <FILE>, --out1 <FILE>     不同时间戳时孔洞总览文件输出*
   -o2 <FILE>, --out2 <FILE>     不同时间戳时各孔洞信息文件输出*
@@ -33,8 +33,18 @@
                                         注：当孔洞含有微元数大于此值时才被视作孔洞，否则会被丢弃
                                         默认值：1
 
-例:./ParticleHoleCalculator  -i ./dump2 -o1 ./out1.txt -o2 ./out2.txt -o3 ./out3.txt -b 10,10,10 -d 20 -t 2 -ND```
+例:./ParticleHoleCalculator  -i ./dump2 -o1 ./out1.txt -o2 ./out2.txt -o3 ./out3.txt -b 10,10,10 -d 20 -t 2
 
 ```
 
 ![preview](./image/cdf27328a844c582267e0f68b5c0a449.png)
+
+## 使用示例截图
+
+原文件
+![原始](./image/image.png)
+
+运行示例
+![VSC](./image/image2.png)
+
+

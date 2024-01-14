@@ -77,7 +77,7 @@ namespace ParticleHoleCalculator
                 "\r\n" +
                 "各参数对长短选项同时适用，多同参数使用时参照后者参数。\r\n" +
                 "  -h, --Help\t\t\t显示帮助信息\r\n" +
-                "  -ND, --NoDebug\t\t开启详细回显\r\n" +
+                "  -D, --Debug\t\t开启详细回显\r\n" +
                 "  -i <FILE>, --in <FILE>\t输入文件路径*\r\n" +
                 "  -o1 <FILE>, --out1 <FILE>\t不同时间戳时孔洞总览文件输出*\r\n" +
                 "  -o2 <FILE>, --out2 <FILE>\t不同时间戳时各孔洞信息文件输出*\r\n" +
