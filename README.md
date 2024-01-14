@@ -1,5 +1,9 @@
 # ParticleHoleCalculator
 
+用于水蒸汽分子群的孔洞识别算法，支持孔洞可视化（OVITO）
+
+## 使用方法
+
 用法：ParticleHoleCalculator -i dump.lammpstrj -o dump_out_hole.lammpstrj [选项]... [参数]...
 
 *# 该程序依赖高IO，若使用较快磁盘可有效改善程序运行速率 #*
